@@ -65,6 +65,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         Sensor mySensor = event.sensor;
         long lastUpdate = 0;
         float last_x = 0, last_y = 0, last_z = 0;
+        int i = 0, count = 0;
+        double [] queda = {0, 0, 0};
         if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             float x = event.values[0];
             float y = event.values[1];
@@ -72,11 +74,18 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
             long curTime = System.currentTimeMillis();
 
-            if ((curTime - lastUpdate) > 100) {
+            if ((curTime - lastUpdate) > 800) {
                 long diffTime = (curTime - lastUpdate);
                 lastUpdate = curTime;
-
-                double queda = Math.sqrt(Math.pow((x - last_x), 2) + Math.pow((y - last_y),2) + Math.pow((z - last_z),2));
+                TextView textQueda = (TextView) findViewById(R.id.queda);
+                queda[i] = Math.sqrt(Math.pow((x - last_x), 2) + Math.pow((y - last_y),2) + Math.pow((z - last_z),2));
+                if (((queda[0] - queda[1])*(queda[0] - queda[1])) > 2 ||( (queda[1] - queda[2])*(queda[1] - queda[2]) ) > 2 || ( (queda[0] - queda[2])*(queda[0] - queda[2]) ) > 2 ) {
+                    count ++;
+                    textQueda.setText("QUEDA DETECTADA: "+count);
+                }
+                else {
+                    textQueda.setText("");
+                }
                 last_x = x;
                 last_y = y;
                 last_z = z;
@@ -94,9 +103,9 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 TextView textZ = (TextView) findViewById(R.id.eixoZ);
                 textZ.setText("Eixo Z " + z + "\n");
 
-                TextView textQueda = (TextView) findViewById(R.id.queda);
-                textQueda.setText("Valor para queda é: "+queda+"\n");
 
+                if (i == 2) i = 0;
+                else i++;
             }
         }
     }
